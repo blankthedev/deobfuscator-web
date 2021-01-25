@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Array-mapped Variable Deobfuscator</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Array-Mapped Variable Deobfuscator</h1>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <div class="container form-group">
+            <label for="arrayVariableNameInput">Array Name:</label>
+            <input class="form-control" id="arrayVariableNameInput" />
+          </div>
+          <div class="container form-group">
+            <label for="stringArrayInput">String Array:</label>
+            <textarea class="form-control" id="stringArrayInput"></textarea>
+          </div>
+          <div class="container form-group">
+            <label for="rawSourceCodeInput">Obfuscated Code:</label>
+            <textarea class="form-control" id="rawSourceCodeInput"></textarea>
+          </div>
+          <div class="container form-group text-center">
+            <button class="btn btn-primary" type="submit" id="submitButton">
+              Deobfuscate
+            </button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="container form-group">
+            <label for="resultText">Result:</label>
+            <textarea class="form-control" id="resultText"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="text-center">
+        <p class="footer">
+          All credit to
+          <a href="https://stackoverflow.com/users/331508/brock-adams"
+            >Brock Adams</a
+          >
+          (and <a href="https://stackoverflow.com/users/299897/ivan">Ivan</a>)
+          for their solutions
+          <a
+            href="https://stackoverflow.com/questions/27627158/replace-array-mapped-variables-with-the-actual-variable-name-string"
+            >here</a
+          >. I simply edited their solutions to allow for simpler user
+          interaction and to work with multi-line arrays.
+        </p>
+      </div>
+    </div>
+
+    <script
+      type="text/javascript"
+      src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"
+    ></script>
+    <script type="text/javascript">
+      $(document).ready(jQueryMain);
+      function jQueryMain() {
+        $("#submitButton").click(function () {
+          var arrayVariableName = $("#arrayVariableNameInput").val().trim();
+          var stringArray = $("#stringArrayInput").val().trim();
+          var rawSourceCode = $("#rawSourceCodeInput").val().trim();
+
+          var stringArrayParsed = JSON.parse(stringArray);
+
+          var variableNameExpression = new RegExp(
+            arrayVariableName + "\\s*\\[\\s*(\\d+)\\s*\\]",
+            "g"
+          );
+          var functionNameExpression = new RegExp(
+            "\\[\\s*" +
+              arrayVariableName +
+              "\\s*\\[\\s*(\\d+)\\s*\\]\\s*\\]\\s*\\(",
+            "g"
+          );
+
+          var replacedSrc = rawSourceCode.replace(
+            functionNameExpression,
+            function (matchStr, parsedIndex) {
+              return "." + stringArrayParsed[parseInt(parsedIndex, 10)] + "(";
+            }
+          );
+
+          replacedSrc = replacedSrc.replace(
+            variableNameExpression,
+            function (matchStr, parsedIndex) {
+              var quote =
+                stringArrayParsed[parseInt(parsedIndex, 10)].indexOf('"') == -1
+                  ? '"'
+                  : "'";
+              return (
+                quote + stringArrayParsed[parseInt(parsedIndex, 10)] + quote
+              );
+            }
+          );
+
+          $("#resultText").text(replacedSrc);
+        });
+      }
+    </script>
+  </body>
+</html>

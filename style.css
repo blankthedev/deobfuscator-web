@@ -1,0 +1,22 @@
+h1 {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#stringArrayInput {
+  height: 25vh;
+}
+
+#rawSourceCodeInput {
+  height: 30vh;
+}
+
+#resultText {
+  height: 75vh;
+}
+
+.footer {
+  margin-top: 60px;
+  font-size: 10pt;
+}
